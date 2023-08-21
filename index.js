@@ -17,8 +17,9 @@ app.post('/login', async(req, res) => {
       res.json({
       success: true,
       username: username,
-      firstname: result.rows[0].first_name,
-      lastname: result.rows[0].last_name,
+      first_name: result.rows[0].first_name,
+      last_name: result.rows[0].last_name,
+      is_admin: result.rows[0].is_admin,
       message: 'Login Successful for '+username
     });
     console.log('Login Successful for '+username);
@@ -93,10 +94,10 @@ app.delete('/todos/:id', async(req, res) => {
 
 app.post('/users', async(req, res) => {
   try {
-    const { username, password, first_name, middle_name, last_name } = req.body;
+    const { username, password, first_name, middle_name, last_name, is_admin } = req.body;
     const newTodo = await pool.query(
-       'INSERT INTO users (username, password, first_name, middle_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [username, password, first_name, middle_name, last_name]
+       'INSERT INTO users (username, password, first_name, middle_name, last_name, is_admin) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [username, password, first_name, middle_name, last_name, is_admin]
     );
     res.json(newTodo.rows[0]);
   } catch (err) {
@@ -128,10 +129,10 @@ app.get('/users/:id', async(req, res) => {
 app.put('/users/:id', async(req, res) => {
   try {
     const { id } = req.params;
-    const { username, password, first_name, middle_name, last_name } = req.body;
+    const { username, password, first_name, middle_name, last_name, is_admin } = req.body;
     const updateTodo = await pool.query(
-      'UPDATE users SET username = $1, password = $2, first_name = $3, middle_name = $4, last_name = $5 WHERE user_id = $6',
-      [username, password, first_name, middle_name, last_name, id]);
+      'UPDATE users SET username = $1, password = $2, first_name = $3, middle_name = $4, last_name = $5, is_admin = $6 WHERE user_id = $7',
+      [username, password, first_name, middle_name, last_name, is_admin, id]);
     res.json('User was updated!');
   } catch (err) {
     console.error(err.message);

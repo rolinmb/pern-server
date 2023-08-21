@@ -11,5 +11,6 @@ CREATE TABLE users(
     password VARCHAR(255),
     first_name VARCHAR(50),
     middle_name VARCHAR(50),
-    last_name VARCHAR(50)
+    last_name VARCHAR(50),
+    is_admin BOOL
 );
