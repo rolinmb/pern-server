@@ -15,9 +15,9 @@ CREATE TABLE users(
     is_admin BOOL
 );
 
-CREATE TYPE order_status AS ENUM ('pending', 'confirmed', 'shipped', 'received');
-
 CREATE TYPE payment_status AS ENUM ('unpaid', 'paid');
+
+CREATE TYPE order_status AS ENUM ('pending', 'confirmed', 'shipped', 'received');
 
 CREATE TABLE orders(
     order_number SERIAL PRIMARY KEY,

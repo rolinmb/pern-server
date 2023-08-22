@@ -151,6 +151,77 @@ app.delete('/users/:id', async(req, res) => {
   }
 });
 
+app.post('/orders', async(req, res) => {
+  try {
+    const { username, shipping_address, order_notes, payment_status, order_status, tracking_number } = req.body;
+    const newOrder = await pool.query(
+      'INSERT INTO orders (placed_by, shipping_address, order_notes, payment_status, order_status, tracking_number) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [username, shipping_address, order_notes, payment_status, order_status, tracking_number]
+    );
+    res.json(newOrder.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.get('/orderlist', async(req, res) => {
+  try {
+    const allTodos = await pool.query('SELECT * FROM orders');
+    res.json(allTodos.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.post('/orderlist', async(req, res) => {
+  try {
+    const { username } = req.body;
+    const allTodos = await pool.query(
+      'SELECT * FROM orders WHERE placed_by = $1',
+      [username]);
+    res.json(allTodos.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.get('/orders/:id', async(req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await pool.query(
+      'SELECT * FROM orders WHERE order_number = $1',
+      [id]);
+    res.json(order.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.put('/orders/:id', async(req, res) => {
+  try {
+    const { id } = req.params;
+    const { shipping_address, order_notes, payment_status, order_status, tracking_number } = req.body;
+    const updateOrder = await pool.query(
+      'UPDATE orders SET shipping_address = $1, order_notes = $2, payment_status = $3, order_status = $4, tracking_number = $5 WHERE order_number = $6',
+      [shipping_address, order_notes, payment_status, order_status, tracking_number, id]);
+    res.json('Order was updated!');
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.delete('/orders/:id', async(req, res) => {
+  try {
+    const { id } = req.params;
+    const deleteOrder = await pool.query(
+      'DELETE FROM orders WHERE order_number = $1',
+      [id]);
+    res.json('Order was deleted!');
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
 app.listen(5000, () => {
   console.log('server has started on port 5000');
 });
