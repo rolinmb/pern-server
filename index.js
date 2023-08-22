@@ -222,6 +222,65 @@ app.delete('/orders/:id', async(req, res) => {
   }
 });
 
+app.post('/items', async(req, res) => {
+  try {
+    const { item_name, item_desc, manufacturer, model_number, stock_qty, unit_price } = req.body;
+    const newItem = await pool.query(
+      'INSERT INTO items (item_name, item_desc, manufacturer, model_number, stock_qty, unit_price) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [item_name, item_desc, manufacturer, model_number, stock_qty, unit_price]
+    );
+    res.json(newItem.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.get('/items', async(req, res) => {
+  try {
+    const allItems = await pool.query('SELECT * FROM items');
+    res.json(allItems.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.get('/items/:num', async(req, res) => {
+  try {
+    const { num } = req.params;
+    const order = await pool.query(
+      'SELECT * FROM items WHERE item_number = $1',
+      [num]);
+    res.json(order.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.put('/items/:num', async(req, res) => {
+  try {
+    const { num } = req.params;
+    const { item_name, item_desc, manufacturer, model_number, stock_qty, unit_price } = req.body;
+    const updateOrder = await pool.query(
+      'UPDATE items SET item_name = $1, item_desc = $2, manufacturer = $3, model_number = $4, stock_qty = $5, unit_price = $6 WHERE item_number = $7',
+      [item_name, item_desc, manufacturer, model_number, stock_qty, unit_price, num]);
+    res.json('Item was updated!');
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
+app.delete('/items/:num', async(req, res) => {
+  try {
+    const { num } = req.params;
+    const deleteOrder = await pool.query(
+      'DELETE FROM orders WHERE order_number = $1',
+      [num]);
+    res.json('Order was deleted!');
+  } catch (err) {
+    console.error(err.message);
+  }
+});
+
 app.listen(5000, () => {
   console.log('server has started on port 5000');
 });
